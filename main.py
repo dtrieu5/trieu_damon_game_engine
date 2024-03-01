@@ -1,4 +1,9 @@
 #this file was created by: Damon Trieu
+# 3 goals to add
+     # moving enemies
+     # projectiles to shoot enemies
+     # more maps/different maps
+
 
 #imprt modules
 import pygame as pg
@@ -114,7 +119,7 @@ class Game:
                if tile == 'C':
                     Coin(self,col, row)
                if tile == 'U':
-                    Coin(self, col, row)
+                    Powerup(self, col, row)
 
      def move(self):
         pass
