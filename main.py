@@ -3,7 +3,7 @@
      # moving enemies
      # projectiles to shoot enemies
      # more maps/different maps
-
+     
 
 #imprt modules
 import pygame as pg
@@ -104,6 +104,7 @@ class Game:
         self.player1 = Player (self, 1, 1)
         self.walls = pg.sprite.Group()
         self.coins = pg.sprite.Group()
+        self.mobs = pg.sprite.Group()
         self.power_ups = pg.sprite.Group()
         self.all_sprites.add(self.player1)
           #    TRANSPLANT THIS
@@ -114,12 +115,14 @@ class Game:
                if tile == '1':
                     print("a wall at", row, col)
                     Wall(self, col, row)
-               if tile == 'P':
+               elif tile == 'P':
                     self.player1 = Player(self, col, row)
-               if tile == 'C':
+               elif tile == 'C':
                     Coin(self,col, row)
                if tile == 'U':
                     Powerup(self, col, row)
+               if tile == 'M':
+                    Mob(self,col,row)
 
      def move(self):
         pass
