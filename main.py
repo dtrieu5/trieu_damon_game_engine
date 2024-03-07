@@ -75,6 +75,14 @@ class Game:
                pg.draw.line(self.screen, LIGHTGREY, (x,0), (x, HEIGHT))
           for y in range(0, HEIGHT, TILESIZE):
                pg.draw.line(self.screen, LIGHTGREY, (0,y), (WIDTH, y)) 
+     def draw_text(self, surface, text, size, color, x, y):
+        font_name = pg.font.match_font('arial')
+        font = pg.font.Font(font_name, size)
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.topleft = (x,y)
+        surface.blit(text_surface, text_rect)
+
      def draw(self):
                self.screen.fill(BGCOLOR)
                self.draw_grid()
@@ -98,6 +106,27 @@ class Game:
                #      # moves player down 1
                #      if event.key == pg.K_DOWN:
                #           self.player1.move(dy=1)
+     def show_start_screen(self):
+          self.screen.fill(BGCOLOR)
+          self.draw_text(self.screen, "this is the start screen", 24, WHITE, WIDTH/2 - 32, 2)
+          pg.display.flip()
+          self.wait_for_key()
+
+     def wait_for_key(self):
+               waiting = True
+               while waiting:
+                    self.clock.tick(FPS)
+                    for event in pg.event.get():
+                         if event.type == pg.QUIT:
+                              waiting = False
+                              self.quit()
+                         if event.type == pg.KEYUP:
+                              waiting = False
+
+
+
+
+
 
      def new(self):
         self.all_sprites = pg.sprite.Group()
@@ -131,6 +160,7 @@ class Game:
 #create a new game
 g = Game()
 #run the game
+g.show_start_screen()
 # g.show_start_screen()
 while True:
      g.new()
