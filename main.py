@@ -134,6 +134,7 @@ class Game:
         self.walls = pg.sprite.Group()
         self.coins = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
+        self.pew_pews = pg.sprite.Group()
         self.power_ups = pg.sprite.Group()
         self.all_sprites.add(self.player1)
           #    TRANSPLANT THIS
