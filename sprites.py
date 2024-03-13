@@ -81,15 +81,15 @@ class Player(pg.sprite.Sprite):
                 self.moneybag += 1
             if str(hits[0].__class__.__name__) == "PowerUp":
                 print(hits[0].__class__.__name__)
-                self.speed += 80000000000000000
+                self.speed += 80
                 self.game.cooldown.cd = 5
                 self.cooling = True
-            if str(hits[0].__class__.__name__) == "Mob":
-                # print(hits[0].__class__.__name__)
-                # print("Collided with mob")
-                # self.hitpoints -= 1
-                if self.status == "Invincible":
-                    print("you can't hurt me")
+            # if str(hits[0].__class__.__name__) == "Mob":
+            #     # print(hits[0].__class__.__name__)
+            #     # print("Collided with mob")
+            #     # self.hitpoints -= 1
+            #     if self.status == "Invincible":
+            #         print("you can't hurt me")
 
     # def collide_with_walls(self, dir):
     #     if dir == 'x':
@@ -183,7 +183,7 @@ class Mob(pg.sprite.Sprite):
         self.vx, self.vy = 100, 100
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.speed = 10
+        self.speed = 1
     def collide_with_walls(self, dir):
         if dir == 'x':
             # print('colliding on the x')
@@ -198,26 +198,22 @@ class Mob(pg.sprite.Sprite):
                 self.vy *= -1
                 self.rect.y = self.y
     def update(self):
-        # self.rect.x += 1
+        self.rect.x += 1
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
         
-        if self.rect.x < self.game.player.rect.x:
+        if self.rect.x < self.game.player1.rect.x:
             self.vx = 100
-        if self.rect.x > self.game.player.rect.x:
+        if self.rect.x > self.game.player1.rect.x:
             self.vx = -100    
-        if self.rect.y < self.game.player.rect.y:
+        if self.rect.y < self.game.player1.rect.y:
             self.vy = 100
-        if self.rect.y > self.game.player.rect.y:
+        if self.rect.y > self.game.player1.rect.y:
             self.vy = -100
         self.rect.x = self.x
         # self.collide_with_walls('x')
         self.rect.y = self.y
         # self.collide_with_walls('y')
-
-
-    def update(self):
-        pass
 
 class PewPew(pg.sprite.Sprite):
     def __init__(self, game, x, y):
