@@ -32,6 +32,9 @@ class Game:
     
      def load_data(self):
           game_folder = path.dirname(__file__)
+          self.img_folder = path.join(game_folder, 'images')
+
+          self.player_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, '28-287463_peter-griffin-family-guy-peter-face.png')).convert_alpha(), (TILESIZE, TILESIZE))
           self.map_data = []
           # 'r'     open for reading (default)
           # 'w'     open for writing, truncating the file first
@@ -145,14 +148,14 @@ class Game:
                if tile == '1':
                     print("a wall at", row, col)
                     Wall(self, col, row)
-               elif tile == 'P':
+               if tile == 'P':
                     self.player1 = Player(self, col, row)
-               elif tile == 'C':
-                    Coin(self,col, row)
+               if tile == 'C':
+                    Coin(self,col, row) 
                if tile == 'U':
                     Powerup(self, col, row)
                if tile == 'M':
-                    Mob(self,col,row)
+                    Mob(self, col, row)
 
      def move(self):
         pass
