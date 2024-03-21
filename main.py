@@ -34,10 +34,11 @@ class Game:
           game_folder = path.dirname(__file__)
           self.img_folder = path.join(game_folder, 'images')
 
-          self.player_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, 'appa.png')).convert_alpha(), (62, 62))
+          self.player_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, 'invincible.png')).convert_alpha(), (60, 60))
           self.mob_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, 'mario-skeleton.png')).convert_alpha(), (55, 55))
           self.coin_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, 'coin.png')).convert_alpha(), (45, 45))
           self.SuperMob_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, 'superbowser.png')).convert_alpha(), (85, 85))
+          self.Powerup_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, 'burger.png')).convert_alpha(), (45, 45))
           self.map_data = []
 
           # 'r'     open for reading (default)
