@@ -34,8 +34,12 @@ class Game:
           game_folder = path.dirname(__file__)
           self.img_folder = path.join(game_folder, 'images')
 
-          self.player_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, '28-287463_peter-griffin-family-guy-peter-face.png')).convert_alpha(), (TILESIZE, TILESIZE))
+          self.player_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, 'appa.png')).convert_alpha(), (62, 62))
+          self.mob_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, 'mario-skeleton.png')).convert_alpha(), (55, 55))
+          self.coin_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, 'coin.png')).convert_alpha(), (45, 45))
+          self.SuperMob_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, 'superbowser.png')).convert_alpha(), (85, 85))
           self.map_data = []
+
           # 'r'     open for reading (default)
           # 'w'     open for writing, truncating the file first
            # 'x'     open for exclusive creation, failing if the file already exists
@@ -86,12 +90,20 @@ class Game:
         text_rect.topleft = (x,y)
         surface.blit(text_surface, text_rect)
 
+        
+
      def draw(self):
                self.screen.fill(BGCOLOR)
                self.draw_grid()
                self.all_sprites.draw(self.screen)
                pg.display.flip()
-
+               # self.draw_health_bar(self.screen, self.player1.rect.x, self.player1.rect.y-8, self.player1.hitpoints)
+               # for m in self.mobs:
+               #      self.draw_health_bar(self.screen, m.rect.x, m.rect.y-8, m.hitpoints*20)
+               # pg.display.flip()
+          
+     
+     
      def events(self):
           for event in pg.event.get():
                if event.type == pg.QUIT:
@@ -137,8 +149,10 @@ class Game:
         self.walls = pg.sprite.Group()
         self.coins = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
+        self.supermobs = pg.sprite.Group()
         self.pew_pews = pg.sprite.Group()
         self.power_ups = pg.sprite.Group()
+        self.chest = pg.sprite.Group()
         self.all_sprites.add(self.player1)
           #    TRANSPLANT THIS
         for row, tiles in enumerate(self.map_data):
@@ -156,6 +170,8 @@ class Game:
                     Powerup(self, col, row)
                if tile == 'M':
                     Mob(self, col, row)
+               if tile == 'S':
+                    SuperMob(self,col,row)
 
      def move(self):
         pass
