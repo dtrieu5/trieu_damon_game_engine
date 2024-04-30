@@ -3,6 +3,8 @@
      # moving enemies
      # projectiles to shoot enemies
      # more maps/different maps
+# one main goal
+     # make the game more difficult/add boss fight
      
 
 #imprt modules
@@ -12,8 +14,6 @@ from settings import *
 from random import randint
 from sprites import *  
 import sys
-
-# TRANSPLANT THIS
 from os import path
 
 # this is to test github
@@ -29,6 +29,7 @@ class Game:
         #setting up pygame clock
         self.clock = pg.time.Clock()
         self.load_data()
+  
     
      def load_data(self):
           game_folder = path.dirname(__file__)
@@ -41,26 +42,10 @@ class Game:
           self.Powerup_img = pg.transform.scale(pg.image.load(path.join(self.img_folder, 'burger.png')).convert_alpha(), (45, 45))
           self.map_data = []
 
-          # 'r'     open for reading (default)
-          # 'w'     open for writing, truncating the file first
-           # 'x'     open for exclusive creation, failing if the file already exists
-          # 'a'     open for writing, appending to the end of the file if it exists
-          # 'b'     binary mode
-           # 't'     text mode (default)
-          # '+'     open a disk file for updating (reading and writing)
-          # 'U'     universal newlines mode (deprecated)
-          # below opens file for reading in text mode
-          # with 
-          '''
-          The with statement is a context manager in Python. 
-          It is used to ensure that a resource is properly closed or released 
-           after it is used. This can help to prevent errors and leaks.
-          '''
-          with open(path.join(game_folder, 'map.txt'), 'rt') as f:
-            for line in f:
-                print(line)
-                self.map_data.append(line)
-          
+          with open(path.join(game_folder, 'map.txt'), 'r') as f:
+               for line in f:
+                    self.map_data.append(line)
+
     # runs our game
      def run(self):
           #game loop -- keep running until we want to stop
@@ -76,7 +61,7 @@ class Game:
           sys.exit()
 
      def update(self):
-          self.all_sprites.update()
+          self.all_sprites.update() 
 
      def draw_grid(self):
           for x in range(0, WIDTH, TILESIZE):
@@ -173,6 +158,7 @@ class Game:
                     Mob(self, col, row)
                if tile == 'S':
                     SuperMob(self,col,row)
+
 
      def move(self):
         pass
