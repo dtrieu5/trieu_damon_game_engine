@@ -139,6 +139,7 @@ class Game:
         self.pew_pews = pg.sprite.Group()
         self.power_ups = pg.sprite.Group()
         self.chest = pg.sprite.Group()
+        self.boom_booms = pg.sprite.Group()
         self.all_sprites.add(self.player1)
           #    TRANSPLANT THIS
         for row, tiles in enumerate(self.map_data):
