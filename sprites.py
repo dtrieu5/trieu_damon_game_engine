@@ -30,6 +30,9 @@ class Player(pg.sprite.Sprite):
     def get_keys(self):
         self.vx, self.vy = 0, 0
         keys = pg.key.get_pressed()
+        if keys[pg.K_k]:
+            print('k')
+            BoomBoom(self.game, self.x, self.y + TILESIZE * 2)
         if keys[pg.K_LEFT] or keys[pg.K_a]:
             self.vx = -self.speed
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
@@ -163,8 +166,9 @@ class Powerup(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.power_ups
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(LIGHTBLUE)
+        # self.image = pg.Surface((TILESIZE, TILESIZE))
+        # self.image.fill(LIGHTBLUE)
+        self.image = game.Powerup_img
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -271,7 +275,7 @@ class PewPew(pg.sprite.Sprite):
         self.game = game
         self.image = pg.Surface((TILESIZE/4, TILESIZE/4))
         # make bullets orange
-        self.image.fill(ORANGE)
+        self.image.fill(RED)
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -293,3 +297,33 @@ class PewPew(pg.sprite.Sprite):
         self.collide_with_group(self.game.mobs, True)
         self.rect.y -= self.speed
         # pass
+
+class BoomBoom(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.boom_booms
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE // 2, TILESIZE // 2))  # Larger projectile size
+        self.image.fill(YELLOW)  # Set color for larger projectiles (e.g., yellow)
+        self.x = x
+        self.y = y
+        self.rect = self.image.get_rect(center=(self.x, self.y))
+        self.speed = 5  # Slower speed for larger projectiles
+        self.fire_delay = 30  # Slower fire rate (adjust as needed)
+        self.last_fire_time = pg.time.get_ticks()
+
+    def collide_with_group(self, group, kill):
+        hits = pg.sprite.spritecollide(self, group, kill)
+        for hit in hits:
+            # Handle collision logic with specific group (e.g., coins, power-ups, mobs)
+            pass
+
+    def update(self):
+        current_time = pg.time.get_ticks()
+        if current_time - self.last_fire_time > self.fire_delay:
+            self.last_fire_time = current_time
+            self.rect.y -= self.speed
+            self.collide_with_group(self.game.coins, True)
+            self.collide_with_group(self.game.power_ups, True)
+            self.collide_with_group(self.game.mobs, True)
+        
