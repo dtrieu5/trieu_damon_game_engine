@@ -33,24 +33,29 @@ class Player(pg.sprite.Sprite):
         if keys[pg.K_k]:
             print('k')
             BoomBoom(self.game, self.x, self.y + TILESIZE * 2)
-        if keys[pg.K_LEFT] or keys[pg.K_a]:
+        if keys[pg.K_a]:
             self.vx = -self.speed
-        if keys[pg.K_RIGHT] or keys[pg.K_d]:
+        if keys[pg.K_d]:
             self.vx = self.speed
-        if keys[pg.K_UP] or keys[pg.K_w]:
+        if keys[pg.K_w]:
             self.vy = -self.speed
-        if keys[pg.K_DOWN] or keys[pg.K_s]:
+        if keys[pg.K_s]:
             self.vy = self.speed
-        if keys[pg.K_e]:
+        if keys[pg.K_DOWN]:
             print("trying to shoot ...")
-            self.pew()
+            PewPew(self.game, self.x, self.y, 0, -10)
+        if keys[pg.K_UP]:
+            print("trying to shoot ...")
+            PewPew(self.game, self.x, self.y, 0, 10)
+        if keys[pg.K_LEFT]:
+            print("trying to shoot ...")
+            PewPew(self.game, self.x, self.y, -10, 0)
+        if keys[pg.K_RIGHT]:
+            print("trying to shoot ...")
+            PewPew(self.game, self.x, self.y, 10, 0)
         if self.vx != 0 and self.vy != 0:
             self.vx *= 0.7071
             self.vy *= 0.7071
-    def pew(self):
-        p = PewPew(self.game, self.rect.x, self.rect.y)
-        print(p.rect.x)
-        print(p.rect.y)
 
 
     # def move(self, dx=0 , dy=0):
@@ -269,7 +274,7 @@ class SuperMob(pg.sprite.Sprite):
         # self.collide_with_walls('y')
 
 class PewPew(pg.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, xspeed, yspeed):
         self.groups = game.all_sprites, game.pew_pews
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -282,7 +287,8 @@ class PewPew(pg.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         # initiate speed of bullets
-        self.speed = 10
+        self.xspeed = xspeed
+        self.yspeed = yspeed
         print("I created a pew pew...")
     def collide_with_group(self, group, kill):
         hits = pg.sprite.spritecollide(self, group, kill)
@@ -295,7 +301,8 @@ class PewPew(pg.sprite.Sprite):
         # makes projectiles kill powerups
         self.collide_with_group(self.game.power_ups, True)
         self.collide_with_group(self.game.mobs, True)
-        self.rect.y -= self.speed
+        self.rect.x += self.xspeed
+        self.rect.y -= self.yspeed
         # pass
 
 class BoomBoom(pg.sprite.Sprite):
@@ -308,8 +315,8 @@ class BoomBoom(pg.sprite.Sprite):
         self.x = x
         self.y = y
         self.rect = self.image.get_rect(center=(self.x, self.y))
-        self.speed = 5  # Slower speed for larger projectiles
-        self.fire_delay = 30  # Slower fire rate (adjust as needed)
+        self.speed = 3  # Slower speed for larger projectiles
+        self.fire_delay = 10  # Slower fire rate (adjust as needed)
         self.last_fire_time = pg.time.get_ticks()
 
     def collide_with_group(self, group, kill):
