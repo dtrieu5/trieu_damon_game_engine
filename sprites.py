@@ -88,16 +88,16 @@ class Player(pg.sprite.Sprite):
             self.vy = self.speed
         if keys[pg.K_DOWN]:
             print("trying to shoot ...")
-            PewPew(self.game, self.x, self.y, 0, -10)
+            PewPew(self.game, self.x, self.y, 0, -10, 300)
         if keys[pg.K_UP]:
             print("trying to shoot ...")
-            PewPew(self.game, self.x, self.y, 0, 10)
+            PewPew(self.game, self.x, self.y, 0, 10, 300)
         if keys[pg.K_LEFT]:
             print("trying to shoot ...")
-            PewPew(self.game, self.x, self.y, -10, 0)
+            PewPew(self.game, self.x, self.y, -10, 0, 300)
         if keys[pg.K_RIGHT]:
             print("trying to shoot ...")
-            PewPew(self.game, self.x, self.y, 10, 0)
+            PewPew(self.game, self.x, self.y, 10, 0, 300)
         # if keys [pg.K_i]:
         #     print("trying to shoot ...")
         #     BoomBoom(self.game, self.x, self.y, 0,10)
@@ -338,7 +338,7 @@ class SuperMob(pg.sprite.Sprite):
         # self.collide_with_walls('y')
 
 class PewPew(pg.sprite.Sprite):
-    def __init__(self, game, x, y, xspeed, yspeed):
+    def __init__(self, game, x, y, xspeed, yspeed, max_range):
         self.groups = game.all_sprites, game.pew_pews
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -353,6 +353,8 @@ class PewPew(pg.sprite.Sprite):
         # initiate speed of bullets
         self.xspeed = xspeed
         self.yspeed = yspeed
+        self.max_range_pixels = max_range
+        self.distance_traveled = 0
         print("I created a pew pew...")
     def collide_with_group(self, group, kill):
         hits = pg.sprite.spritecollide(self, group, kill)
@@ -367,7 +369,10 @@ class PewPew(pg.sprite.Sprite):
         self.collide_with_group(self.game.mobs, True)
         self.rect.x += self.xspeed
         self.rect.y -= self.yspeed
+        self.distance_traveled += abs(self.xspeed) + abs(self.yspeed)
         # pass
+        if self.distance_traveled > self.max_range_pixels:
+            self.kill()
         hits = pg.sprite.spritecollide(self, self.game.mobs, True)
         for mob in hits:
             mob.take_damage(1)  # Reduce mob's health by 1 when hit by pew pew
