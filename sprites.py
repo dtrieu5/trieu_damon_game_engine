@@ -2,8 +2,28 @@
 # This code was inspired by Zelda and informed by Chris Bradfield
 
 import pygame as pg
+from pygame.sprite import Group
 from settings import *
 # allows us to use pygame and imports all settings from settings
+# copied from chatgpt
+class Health(pg.sprite.Sprite):
+    def __init__(self, max_health):
+        self.max_health = max_health
+        self.current_health = max_health
+
+    def take_damage(self, amount):
+        self.current_health -= amount
+        if self.current_health < 0:
+            self.current_health = 0
+
+    def heal(self, amount):
+        self.current_health += amount
+        if self.current_health > self.max_health:
+            self.current_health = self.max_health
+
+    def is_alive(self):
+        return self.current_health > 0
+
 
 # inherit from subclass of pg.sprite
 class Player(pg.sprite.Sprite):
@@ -21,11 +41,36 @@ class Player(pg.sprite.Sprite):
         self.vx, self.vy = 0,0
         self.x = x * TILESIZE
         self.y = y * TILESIZE
+        self.health = Health(max_health=10)
         self.moneybag = 0
         self.speed = 300
         self.status = ""
         self.hitpoints = 100
         self.cooling = False
+
+        def update(self):
+        # Handle movement and other updates
+
+        # Collision with mobs
+            hits = pg.sprite.spritecollide(self, self.game.mobs, False)
+            for mob in hits:
+            # Reduce player health when hit by a mob
+                self.health.take_damage(1)  # Adjust damage amount as needed
+            if not self.health.is_alive():
+                # Player is dead, handle game over logic here
+                self.game_over()
+            def game_over(self):
+        # Reset the game or show game over screen
+                self.game.show_game_over_screen()  # Implement this method in your Game class
+            
+        def collide_with_mobs(self):
+        # Check for collisions with mobs
+            hits = pg.sprite.spritecollide(self, self.game.mobs, False)
+            for mob in hits:
+            # Reduce player health when hit by a mob
+                self.health.take_damage(1)
+                if not self.health.is_alive():
+                    self.game_over()
     
     def get_keys(self):
         self.vx, self.vy = 0, 0
@@ -53,6 +98,9 @@ class Player(pg.sprite.Sprite):
         if keys[pg.K_RIGHT]:
             print("trying to shoot ...")
             PewPew(self.game, self.x, self.y, 10, 0)
+        # if keys [pg.K_i]:
+        #     print("trying to shoot ...")
+        #     BoomBoom(self.game, self.x, self.y, 0,10)
         if self.vx != 0 and self.vy != 0:
             self.vx *= 0.7071
             self.vy *= 0.7071
@@ -93,6 +141,16 @@ class Player(pg.sprite.Sprite):
                 self.speed += 80
                 self.game.cooldown.cd = 5
                 self.cooling = True
+            if str(hits[0].__class__.__name__) == "Mob":
+                self.hitpoints -= 1
+                hits[0].health -= 1
+                if self.status == "Invincible":
+                    print("you can't hurt me")
+            if str(hits[0].__class__.__name__) == "Supermob":
+                self.hitpoints -= 1
+                hits[0].health -= 1
+                if self.status == "Invincible":
+                    print("you can't hurt me")
             # if str(hits[0].__class__.__name__) == "Mob":
             #     # print(hits[0].__class__.__name__)
             #     # print("Collided with mob")
@@ -182,7 +240,7 @@ class Powerup(pg.sprite.Sprite):
 
 
 class Mob(pg.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, health = 15):
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -196,6 +254,8 @@ class Mob(pg.sprite.Sprite):
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.speed = 1
+        self.health = health
+
     def collide_with_walls(self, dir):
         if dir == 'x':
             # print('colliding on the x')
@@ -226,6 +286,10 @@ class Mob(pg.sprite.Sprite):
         # self.collide_with_walls('x')
         self.rect.y = self.y
         # self.collide_with_walls('y')
+    def take_damage(self, damage):
+        self.health = damage
+        if self.health <=0:
+            self.kill()
 
 class SuperMob(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -280,7 +344,7 @@ class PewPew(pg.sprite.Sprite):
         self.game = game
         self.image = pg.Surface((TILESIZE/4, TILESIZE/4))
         # make bullets orange
-        self.image.fill(RED)
+        self.image = game.pewpew_img
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -304,19 +368,27 @@ class PewPew(pg.sprite.Sprite):
         self.rect.x += self.xspeed
         self.rect.y -= self.yspeed
         # pass
+        hits = pg.sprite.spritecollide(self, self.game.mobs, True)
+        for mob in hits:
+            mob.take_damage(1)  # Reduce mob's health by 1 when hit by pew pew
+            if mob.health <= 0:
+                self.game.score += 1  # Increase score when mob is defeated
+
+        # Destroy pew pew when it goes off-screen
+        if self.rect.x > WIDTH or self.rect.x < 0 or self.rect.y > HEIGHT or self.rect.y < 0:
+            self.kill()  # Remove pew pew from sprite groups
 
 class BoomBoom(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.boom_booms
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE // 2, TILESIZE // 2))  # Larger projectile size
-        self.image.fill(YELLOW)  # Set color for larger projectiles (e.g., yellow)
+        self.image = game.boomboom_img
         self.x = x
         self.y = y
         self.rect = self.image.get_rect(center=(self.x, self.y))
         self.speed = 3  # Slower speed for larger projectiles
-        self.fire_delay = 10  # Slower fire rate (adjust as needed)
+        self.fire_delay = 0.2  # Slower fire rate (adjust as needed)
         self.last_fire_time = pg.time.get_ticks()
 
     def collide_with_group(self, group, kill):
@@ -330,7 +402,6 @@ class BoomBoom(pg.sprite.Sprite):
         if current_time - self.last_fire_time > self.fire_delay:
             self.last_fire_time = current_time
             self.rect.y -= self.speed
-            self.collide_with_group(self.game.coins, True)
-            self.collide_with_group(self.game.power_ups, True)
-            self.collide_with_group(self.game.mobs, True)
+            self.collide_with_group(self.game.supermobs, True)
+    
         
