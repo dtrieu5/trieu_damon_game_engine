@@ -6,23 +6,23 @@ from pygame.sprite import Group
 from settings import *
 # allows us to use pygame and imports all settings from settings
 # copied from chatgpt
-class Health(pg.sprite.Sprite):
-    def __init__(self, max_health):
-        self.max_health = max_health
-        self.current_health = max_health
-
-    def take_damage(self, amount):
-        self.current_health -= amount
-        if self.current_health < 0:
-            self.current_health = 0
-
-    def heal(self, amount):
-        self.current_health += amount
-        if self.current_health > self.max_health:
-            self.current_health = self.max_health
-
-    def is_alive(self):
-        return self.current_health > 0
+class HealthBar(pg.sprite.Sprite):
+    def __init__(self, game, x, y, w, h, target, pct):
+        self.groups = game.all_sprites
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.w = w
+        self.h = h
+        self.image = pg.Surface((w, h))
+        self.rect = self.image.get_rect()
+        self.image.fill(GREEN)
+        self.rect.x = x
+        self.rect.y = y
+        self.target = target
+        self.pct = pct
+    def update(self):
+        self.rect.x = self.target.rect.x
+        self.rect.y = self.target.rect.y
 
 
 # inherit from subclass of pg.sprite
@@ -41,36 +41,36 @@ class Player(pg.sprite.Sprite):
         self.vx, self.vy = 0,0
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.health = Health(max_health=10)
         self.moneybag = 0
         self.speed = 300
         self.status = ""
         self.hitpoints = 100
+        self.healthbay = HealthBar(self.game, self.rect.x, self.rect.y, self.rect.w, 5, self, self.hitpoints)
         self.cooling = False
 
-        def update(self):
-        # Handle movement and other updates
+        # def update(self):
+        # # Handle movement and other updates
 
-        # Collision with mobs
-            hits = pg.sprite.spritecollide(self, self.game.mobs, False)
-            for mob in hits:
-            # Reduce player health when hit by a mob
-                self.health.take_damage(1)  # Adjust damage amount as needed
-            if not self.health.is_alive():
-                # Player is dead, handle game over logic here
-                self.game_over()
-            def game_over(self):
-        # Reset the game or show game over screen
-                self.game.show_game_over_screen()  # Implement this method in your Game class
+        # # Collision with mobs
+        #     hits = pg.sprite.spritecollide(self, self.game.mobs, False)
+        #     for mob in hits:
+        #     # Reduce player health when hit by a mob
+        #         self.health.take_damage(1)  # Adjust damage amount as needed
+        #     if not self.health.is_alive():
+        #         # Player is dead, handle game over logic here
+        #         self.game_over()
+        #     def game_over(self):
+        # # Reset the game or show game over screen
+        #         self.game.show_game_over_screen()  # Implement this method in your Game class
             
-        def collide_with_mobs(self):
-        # Check for collisions with mobs
-            hits = pg.sprite.spritecollide(self, self.game.mobs, False)
-            for mob in hits:
-            # Reduce player health when hit by a mob
-                self.health.take_damage(1)
-                if not self.health.is_alive():
-                    self.game_over()
+        # def collide_with_mobs(self):
+        # # Check for collisions with mobs
+        #     hits = pg.sprite.spritecollide(self, self.game.mobs, False)
+        #     for mob in hits:
+        #     # Reduce player health when hit by a mob
+        #         self.health.take_damage(1)
+        #         if not self.health.is_alive():
+        #             self.game_over()
     
     def get_keys(self):
         self.vx, self.vy = 0, 0
@@ -151,6 +151,7 @@ class Player(pg.sprite.Sprite):
                 hits[0].health -= 1
                 if self.status == "Invincible":
                     print("you can't hurt me")
+            
             # if str(hits[0].__class__.__name__) == "Mob":
             #     # print(hits[0].__class__.__name__)
             #     # print("Collided with mob")
